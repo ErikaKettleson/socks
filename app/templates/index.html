@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1> Socks For Sale </h1>
+    {% for sock in socks %}
+    <div><p>{{ sock.name }}</p></div>
+    {% endfor %}
+{% endblock %}
