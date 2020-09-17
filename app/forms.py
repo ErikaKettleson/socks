@@ -18,4 +18,4 @@ class AddressForm(FlaskForm):
     city = StringField('City', validators=[DataRequired()])
     state = StringField('State', validators=[DataRequired()])
 
-    submit = SubmitField('Check Delivery Availability')
+    submit = SubmitField('Place 2-Hr Delivery Order')

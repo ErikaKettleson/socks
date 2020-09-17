@@ -6,11 +6,7 @@ from app.forms import AddressForm
 import requests
 import json
 
-
-@app.route('/')
-@app.route('/index')
-
-@app.route('/order', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def order():
     form = AddressForm()
     if form.validate_on_submit():
@@ -23,7 +19,8 @@ def order():
 
         quote_data = {
             'dropoff_address': dropoff_address,
-            'pickup_address': '155 Lexington St. San Francisco, CA'
+            'pickup_address': '155 Lexington St. San Francisco, CA',
+            'dropoff_deadline_dt': time
         }
         auth = {
             'Content-Type': 'application/x-www-form-urlencoded',
