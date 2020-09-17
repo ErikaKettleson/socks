@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Check Address for 2-Hr Delivery</h1>
+    <h1>Socks Orders</h1>
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
+        <p>
+            {{ form.socks.label }}<br>
+            {{ form.socks(size=32) }}<br>
+            {% for error in form.street.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
         <p>
             {{ form.name.label }}<br>
             {{ form.name(size=32) }}<br>
