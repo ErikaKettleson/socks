@@ -8,12 +8,10 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class AddressForm(FlaskForm):
-    sock_options = ['Mohair\rFur\rMesh\rCrochet\rTufted\n']
-    list_of_socks = sock_options[0].split()
-    # create a list of value/description tuples
-    options = [(x, x) for x in list_of_socks]
+    sock_options = ['Mohair', 'Fur', 'Mesh', 'Tufted', 'Crochet']
+    options = [(x, x) for x in sock_options]
 
-    socks = MultiCheckboxField('Socks', choices=options)
+    socks = MultiCheckboxField('Socks In Stock', choices=options)
     name = StringField('Name', validators=[DataRequired()])
     phone = StringField('Phone', validators=[DataRequired()])
     street = StringField('Street', validators=[DataRequired()])

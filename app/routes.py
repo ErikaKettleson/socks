@@ -1,4 +1,6 @@
 from flask import render_template, flash, redirect, url_for
+from datetime import datetime, timedelta
+from pytz import timezone, utc
 from app import app
 from app.forms import AddressForm
 import requests
@@ -7,31 +9,6 @@ import json
 
 @app.route('/')
 @app.route('/index')
-def index():
-    socks = [
-        {
-            'name': 'Mohair',
-            'size': 'One-Size'
-        },
-        {
-            'name': 'Fur',
-            'size': 'One-Size'
-        },
-        {
-            'name': 'Mesh',
-            'size': 'One-Size'
-        },
-        {
-            'name': 'Tufted',
-            'size': 'One-Size'
-        },
-        {
-            'name': 'Crochet',
-            'size': 'One-Size'
-        },
-    ]
-    return render_template('index.html', title='Home', socks=socks)
-
 
 @app.route('/order', methods=['GET', 'POST'])
 def order():
@@ -39,7 +16,10 @@ def order():
     if form.validate_on_submit():
         dropoff_address = form.street.data + ' ' + \
             form.city.data + ' ' + form.state.data
-        print('Quote Submitted for address {}'.format(dropoff_address))
+        
+        current_utc = datetime.utcnow()
+        deadline_utc = current_utc + timedelta(hours=2)
+        time = utc.localize(deadline_utc, is_dst=None).astimezone(timezone('US/Pacific')).isoformat()
 
         quote_data = {
             'dropoff_address': dropoff_address,
@@ -51,37 +31,39 @@ def order():
         }
         res = requests.post(
             'https://api.postmates.com/v1/customers/cus_MpuW-m0uomjj7F/delivery_quotes', data=quote_data, headers=auth)
+        
         quote_id = res.json()['id']
 
         if res.status_code != 200:
-            return _('We\'re Sorry: Delivery not available.')
+            return ('We\'re Sorry: Delivery not available.')
         else:
-            print('Submitted Quote, got id {}, about to Submit Order {}'.format(
-                quote_id, dropoff_address))
+            items = list()
 
-            items = [
-                {
-                'name': 'Mohair',
-                'quantity': 1,
-                'size': 'small'
-                }
-            ]
+            for i in range(len(form.socks.data)):
+                items.append({
+                    'name': form.socks.data[i],
+                    'quantity': 1,
+                    'size': 'small'
+                })
 
             order_data = {
                 'dropoff_address': dropoff_address,
-                'dropoff_name': 'erika',
-                'dropoff_phone_number': '9085918760',
+                'dropoff_name': form.name.data,
+                'dropoff_phone_number': form.phone.data,
                 'pickup_address': '155 Lexington St. San Francisco, CA',
                 'pickup_name': 'SF Socks Store',
                 'pickup_phone_number': '9082477262',
                 'quote_id': quote_id,
                 'manifest': 'socks',
                 'manifest_items': json.dumps(items),
+                'dropoff_deadline_dt': time
             }
 
             resp = requests.post(
                 'https://api.postmates.com/v1/customers/cus_MpuW-m0uomjj7F/deliveries', data=order_data, headers=auth)
 
-            print(resp.status_code, resp.json())
-
+            if resp.status_code != 200:
+                return ('We\'re Sorry: Ordering not available')
+            else:
+                flash('Thank you for your order!')
     return render_template('order.html', title='Order Socks', form=form)

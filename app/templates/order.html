@@ -7,7 +7,7 @@
         <p>
             {{ form.socks.label }}<br>
             {{ form.socks(size=32) }}<br>
-            {% for error in form.street.errors %}
+            {% for error in form.socks.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
