@@ -6,6 +6,12 @@ from app.forms import AddressForm
 import requests
 import json
 
+
+@app.route('/debug-sentry', methods=['GET', 'POST'])
+def trigger_error():
+    division_by_zero = 1 / 0
+    # trigger sentry error (visible in sentry dashboard)
+
 @app.route('/', methods=['GET', 'POST'])
 def order():
     form = AddressForm()
